@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BANTY ADMIN PANEL</title>
+<style>
+:root{--bg:#050b0b;--card:#101827;--card2:#0a111d;--line:#26364f;--text:#f4f7ff;--muted:#a8b4ca;--accent:#20e7ad;--danger:#ff6b7d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#073a32 0,#050b0b 42%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:28px 16px 60px}.panel{background:rgba(15,23,38,.96);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 20px 70px #0008}
+h1{font-size:42px;margin:0 0 8px;line-height:1.05}.sub{color:var(--muted);font-size:19px;margin-bottom:25px}.online{display:inline-block;background:#073d34;color:var(--accent);padding:10px 18px;border-radius:30px;font-weight:700}
+.login{max-width:600px;margin:70px auto}.field{margin:18px 0}label{display:block;font-size:17px;margin-bottom:8px}input,select{width:100%;padding:16px;border-radius:15px;border:1px solid var(--line);background:#070d17;color:white;font-size:16px;outline:none}input:focus{border-color:var(--accent)}
+button{border:0;border-radius:15px;padding:15px 22px;background:#1b2940;color:white;font-size:16px;font-weight:700;cursor:pointer;margin:5px}button:hover{filter:brightness(1.15)}.primary{background:var(--accent);color:#04130f}.danger{background:#57212c}.ghost{background:#1a263a}.msg{margin-top:12px;color:#ffb4bf;min-height:22px}
+.nav{display:flex;gap:10px;overflow:auto;margin:25px 0}.nav button{white-space:nowrap}.nav .active{background:#24324b;border:1px solid #3b4e6d}
+.tab{display:none}.tab.show{display:block}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.stat{background:#07101c;border:1px solid var(--line);border-radius:22px;padding:24px}.stat b{display:block;color:var(--muted);font-size:18px;margin-bottom:18px}.num{font-size:48px}.box{background:#07101c;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:16px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #1d2a3e;padding:15px 0}.row:last-child{border-bottom:0}.small{color:var(--muted);font-size:14px}.key{font-family:monospace;word-break:break-all}.empty{color:var(--muted);padding:20px 0;text-align:center}
+@media(max-width:650px){.wrap{padding:18px 8px}.panel{padding:22px 18px;border-radius:24px}h1{font-size:38px}.grid{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}.row button{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="loginView" class="panel login">
+    <h1>⚡ BANTY ADMIN PANEL</h1>
+    <div class="sub">Secure admin login</div>
+    <div class="field"><label>Username</label><input id="username" value="admin" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+    <button class="primary" onclick="login()">Login</button>
+    <div id="loginMsg" class="msg"></div>
+  </section>
+
+  <section id="appView" class="panel" style="display:none">
+    <div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap">
+      <div><h1>⚡ BANTY ADMIN PANEL</h1><div class="sub">APK / TOOL CONTROL CENTER • V1</div></div>
+      <span class="online">ONLINE</span>
+    </div>
+
+    <div class="nav">
+      <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
+      <button onclick="showTab('products',this)">Files / Products</button>
+      <button onclick="showTab('keys',this)">License Keys</button>
+      <button onclick="showTab('users',this)">Users</button>
+      <button onclick="showTab('settings',this)">Tool Settings</button>
+    </div>
+
+    <div id="dashboard" class="tab show">
+      <div class="grid">
+        <div class="stat"><b>Products</b><span class="num" id="sProducts">0</span></div>
+        <div class="stat"><b>Active Keys</b><span class="num" id="sKeys">0</span></div>
+        <div class="stat"><b>Users</b><span class="num" id="sUsers">0</span></div>
+        <div class="stat"><b>Sales</b><span class="num">₹<span id="sSales">0</span></span></div>
+      </div>
+    </div>
+
+    <div id="products" class="tab">
+      <div class="box">
+        <h2>Add Product</h2>
+        <div class="field"><label>Product name</label><input id="productName" placeholder="Example: BANTY MIUI PAID FILE"></div>
+        <div class="field"><label>File / download link</label><input id="productUrl" placeholder="https://..."></div>
+        <button class="primary" onclick="addProduct()">Add Product</button>
+      </div>
+      <div class="box"><h2>Products</h2><div id="productList"></div></div>
+    </div>
+
+    <div id="keys" class="tab">
+      <div class="box">
+        <h2>Generate License Key</h2>
+        <div class="field"><label>Days</label><input id="keyDays" type="number" value="30" min="1"></div>
+        <button class="primary" onclick="generateKey()">Generate Key</button>
+      </div>
+      <div class="box"><h2>License Keys</h2><div id="keyList"></div></div>
+    </div>
+
+    <div id="users" class="tab">
+      <div class="box">
+        <h2>Add User</h2>
+        <div class="field"><label>Username</label><input id="newUser" placeholder="Username"></div>
+        <button class="primary" onclick="addUser()">Add User</button>
+      </div>
+      <div class="box"><h2>Users</h2><div id="userList"></div></div>
+    </div>
+
+    <div id="settings" class="tab">
+      <div class="box">
+        <h2>Tool Settings</h2>
+        <div class="field"><label>Panel title</label><input id="panelTitle" value="⚡ BANTY ADMIN PANEL"></div>
+        <button class="primary" onclick="saveSettings()">Save Settings</button>
+        <button class="danger" onclick="resetData()">Reset Demo Data</button>
+        <p class="small">This GitHub Pages version stores data only in this browser using localStorage. It does not provide a real server/database.</p>
+      </div>
+    </div>
+
+    <button class="ghost" onclick="logout()">Logout</button>
+  </section>
+</div>
+
+<script>
+const DEFAULT={
+  products:[{name:"Demo Product",url:""}],
+  keys:[],
+  users:[{name:"admin"}],
+  sales:0,
+  title:"⚡ BANTY ADMIN PANEL"
+};
+let data=JSON.parse(localStorage.getItem("banty_admin_data")||"null")||structuredClone(DEFAULT);
+
+function save(){localStorage.setItem("banty_admin_data",JSON.stringify(data));render()}
+function login(){
+  const u=document.getElementById("username").value.trim();
+  const p=document.getElementById("password").value;
+  if(u==="admin" && p==="CHANGE_ME"){
+    sessionStorage.setItem("banty_logged","1");
+    document.getElementById("loginView").style.display="none";
+    document.getElementById("appView").style.display="block";
+    render();
+  }else document.getElementById("loginMsg").textContent="Wrong username or password.";
+}
+function logout(){sessionStorage.removeItem("banty_logged");location.reload()}
+function showTab(id,btn){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("show"));
+  document.getElementById(id).classList.add("show");
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+function addProduct(){
+  const n=document.getElementById("productName").value.trim(), u=document.getElementById("productUrl").value.trim();
+  if(!n)return alert("Product name required.");
+  data.products.push({name:n,url:u});document.getElementById("productName").value="";document.getElementById("productUrl").value="";save();
+}
+function deleteProduct(i){if(confirm("Delete this product?")){data.products.splice(i,1);save()}}
+function generateKey(){
+  const days=Math.max(1,Number(document.getElementById("keyDays").value)||30);
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const part=()=>Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join("");
+  data.keys.push({key:"BANTY-"+part()+"-"+part(),days,active:true,created:new Date().toLocaleString()});save();
+}
+function toggleKey(i){data.keys[i].active=!data.keys[i].active;save()}
+function deleteKey(i){data.keys.splice(i,1);save()}
+function addUser(){
+  const n=document.getElementById("newUser").value.trim();if(!n)return alert("Username required.");
+  data.users.push({name:n});document.getElementById("newUser").value="";save();
+}
+function deleteUser(i){if(data.users[i]?.name==="admin")return alert("Admin user cannot be deleted.");data.users.splice(i,1);save()}
+function saveSettings(){data.title=document.getElementById("panelTitle").value.trim()||DEFAULT.title;save();alert("Settings saved.")}
+function resetData(){if(confirm("Reset all local demo data?")){data=structuredClone(DEFAULT);save()}}
+function render(){
+  document.getElementById("sProducts").textContent=data.products.length;
+  document.getElementById("sKeys").textContent=data.keys.filter(k=>k.active).length;
+  document.getElementById("sUsers").textContent=data.users.length;
+  document.getElementById("sSales").textContent=data.sales;
+  document.querySelectorAll("h1").forEach((h,i)=>{if(i<2)h.textContent=data.title});
+  document.getElementById("panelTitle").value=data.title;
+
+  document.getElementById("productList").innerHTML=data.products.length?data.products.map((p,i)=>`
+    <div class="row"><div><b>${esc(p.name)}</b><div class="small">${esc(p.url||"No link")}</div></div>
+    <button class="danger" onclick="deleteProduct(${i})">Delete</button></div>`).join(""):'<div class="empty">No products.</div>';
+
+  document.getElementById("keyList").innerHTML=data.keys.length?data.keys.map((k,i)=>`
+    <div class="row"><div><b class="key">${esc(k.key)}</b><div class="small">${k.days} days • ${esc(k.created)}</div></div>
+    <div><button onclick="toggleKey(${i})">${k.active?"Disable":"Enable"}</button><button class="danger" onclick="deleteKey(${i})">Delete</button></div></div>`).join(""):'<div class="empty">No license keys.</div>';
+
+  document.getElementById("userList").innerHTML=data.users.length?data.users.map((u,i)=>`
+    <div class="row"><div><b>${esc(u.name)}</b></div><button class="danger" onclick="deleteUser(${i})">Delete</button></div>`).join(""):'<div class="empty">No users.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+if(sessionStorage.getItem("banty_logged")==="1"){document.getElementById("loginView").style.display="none";document.getElementById("appView").style.display="block";render()}
+</script>
+</body>
+</html>
