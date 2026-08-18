@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BANTY ADMIN PANEL</title>
+<style>
+:root{--bg:#07090e;--card:#10141c;--line:#252d3a;--text:#f5f7fb;--muted:#8f9aaa;--a:#00ff9d;--b:#ff00e6}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#15201d 0,#07090e 35%,#07090e 100%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;border:1px solid #00ff9d22;box-shadow:inset 0 0 80px #00ff9d0d, inset 0 0 80px #ff00e60d}
+header{position:sticky;top:0;z-index:5;background:#0b0e14eF;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top{max-width:1100px;margin:auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:900;letter-spacing:1px;text-shadow:0 0 12px var(--a)}.tag{font-size:11px;color:var(--muted)}
+button{border:1px solid #ffffff12;border-radius:10px;padding:10px 13px;background:linear-gradient(90deg,var(--a),#54ffc8);color:#00150e;font-weight:800;cursor:pointer}
+button.alt{background:#1b222d;color:#fff}.danger{background:#351820!important;color:#ffb9c3!important}
+.wrap{max-width:1100px;margin:auto;padding:18px 16px 40px}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px}.tabs button{white-space:nowrap}.tabs .active{box-shadow:0 0 16px #00ff9d33}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px}.stat b{font-size:24px;display:block;margin-top:7px}.muted{color:var(--muted);font-size:12px}
+.card{background:#0f131beF;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}.title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.title h2,.title h3{margin:0}
+input,textarea,select{width:100%;background:#090c12;color:#fff;border:1px solid #303947;border-radius:10px;padding:11px;margin-top:6px;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--a);box-shadow:0 0 0 2px #00ff9d12}
+label{display:block;font-size:12px;color:#aeb7c5;margin:10px 0}.row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#aeb7c5}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;background:#14261f;color:#69ffc6}.off{background:#321a20;color:#ff9dab}
+.product{display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.product:last-child{border-bottom:0}.price{font-size:20px;font-weight:900}.empty{text-align:center;color:var(--muted);padding:35px 10px}
+.notice{padding:11px 13px;border-radius:10px;background:#151d2a;color:#b9c5d6;font-size:12px;line-height:1.5}
+.hidden{display:none!important}
+@media(max-width:750px){.grid{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr}table{font-size:12px}.hide-mobile{display:none}.top{padding:12px}.wrap{padding:14px 12px 35px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="logo">⚡ BANTY ADMIN PANEL</div><div class="tag">APK / TOOL CONTROL CENTER • V1</div></div><button class="alt" onclick="resetDemo()">Reset Demo</button></div></header>
+<main class="wrap">
+<div class="tabs">
+<button class="active" data-tab="dash">Dashboard</button>
+<button data-tab="products">Files / Products</button>
+<button data-tab="keys">License Keys</button>
+<button data-tab="users">Users</button>
+<button data-tab="settings">Tool Settings</button>
+</div>
+
+<section id="dash">
+<div class="grid">
+<div class="stat"><span class="muted">Products</span><b id="sProducts">0</b></div>
+<div class="stat"><span class="muted">Active Keys</span><b id="sKeys">0</b></div>
+<div class="stat"><span class="muted">Users</span><b id="sUsers">0</b></div>
+<div class="stat"><span class="muted">Sales</span><b id="sSales">₹0</b></div>
+</div>
+<div class="card" style="margin-top:14px">
+<div class="title"><h2>Tool Status</h2><span id="statusPill" class="pill">ONLINE</span></div>
+<div class="notice">यह V1 admin panel अभी browser-local demo है। Payment, secure license verification और real APK remote-control के लिए server/API लगाना होगा; कोई secret key इस HTML में नहीं रखी गई है।</div>
+</div>
+</section>
+
+<section id="products" class="hidden">
+<div class="card">
+<div class="title"><h2>Add / Edit Product</h2></div>
+<div class="row">
+<label>File / Product Name<input id="pName" placeholder="MIUI DRAG HS V33 SAFE"></label>
+<label>Price (₹)<input id="pPrice" type="number" min="0" step="0.01" placeholder="199"></label>
+</div>
+<label>Description<textarea id="pDesc" placeholder="Premium MIUI file"></textarea></label>
+<label>Download URL<input id="pUrl" placeholder="https://www.mediafire.com/file/..."></label>
+<div class="row">
+<label>Version<input id="pVersion" placeholder="V33"></label>
+<label>Status<select id="pActive"><option value="true">Active</option><option value="false">Disabled</option></select></label>
+</div>
+<div class="actions"><button onclick="saveProduct()">Save Product</button><button class="alt" onclick="clearProductForm()">Clear</button></div>
+<input id="editId" type="hidden">
+</div>
+<div class="card"><div class="title"><h2>Products</h2></div><div id="productList"></div></div>
+</section>
+
+<section id="keys" class="hidden">
+<div class="card">
+<div class="title"><h2>Generate Individual Key</h2></div>
+<div class="row">
+<label>User / Email<input id="kUser" placeholder="user@example.com"></label>
+<label>Product<select id="kProduct"></select></label>
+</div>
+<div class="row">
+<label>Expiry<select id="kExpiry"><option value="7">7 Days</option><option value="30">30 Days</option><option value="90">90 Days</option><option value="365">365 Days</option></select></label>
+<label>Device Limit<input value="1 DEVICE" disabled></label>
+</div>
+<div class="actions"><button onclick="generateKey()">Generate Key</button></div>
+</div>
+<div class="card"><div class="title"><h2>Keys</h2></div><div style="overflow:auto"><table><thead><tr><th>Key</th><th>User</th><th>Product</th><th>Expiry</th><th>Device</th><th>Status</th><th></th></tr></thead><tbody id="keyRows"></tbody></table></div></div>
+</section>
+
+<section id="users" class="hidden">
+<div class="card"><div class="title"><h2>Users</h2></div><div style="overflow:auto"><table><thead><tr><th>User</th><th>Wallet</th><th>Purchases</th><th>Status</th></tr></thead><tbody id="userRows"></tbody></table></div></div>
+</section>
+
+<section id="settings" class="hidden">
+<div class="card">
+<div class="title"><h2>Remote Tool Controls</h2><span id="settingsStatus" class="pill">Saved</span></div>
+<div class="row">
+<label>Tool Name<input id="setName"></label>
+<label>Tool Status<select id="setEnabled"><option value="true">ON</option><option value="false">OFF</option></select></label>
+</div>
+<div class="row">
+<label>RGB Effect<select id="setRgb"><option value="true">ON</option><option value="false">OFF</option></select></label>
+<label>Maintenance Mode<select id="setMaintenance"><option value="false">OFF</option><option value="true">ON</option></select></label>
+</div>
+<div class="row">
+<label>Primary Color<input id="setA" type="color"></label>
+<label>Secondary Color<input id="setB" type="color"></label>
+</div>
+<div class="actions"><button onclick="saveSettings()">Save Settings</button></div>
+</div>
+</section>
+</main>
+
+<script>
+const KEY='banty_admin_v1';
+const media='https://www.mediafire.com/file/rd5mhxy7sh6c9gn/MIUI+DRAG+HS+V33+SAFE.zip/file';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ products:[{id:1,name:'MIUI DRAG HS V33 SAFE',price:199,description:'Premium MIUI file',url:media,version:'V33',active:true}],
+ keys:[],users:[{email:'demo@user.com',wallet:500,purchases:0,active:true}],
+ sales:0, settings:{name:'BANTY TOOL',enabled:true,rgb:true,maintenance:false,a:'#00ff9d',b:'#ff00e6'}
+};
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function render(){
+ document.getElementById('sProducts').textContent=db.products.length;
+ document.getElementById('sKeys').textContent=db.keys.filter(x=>x.status==='ACTIVE').length;
+ document.getElementById('sUsers').textContent=db.users.length;
+ document.getElementById('sSales').textContent='₹'+db.sales;
+ document.getElementById('statusPill').textContent=db.settings.enabled?'ONLINE':'OFFLINE';
+ document.getElementById('statusPill').className='pill '+(db.settings.enabled?'':'off');
+ document.documentElement.style.setProperty('--a',db.settings.a);
+ document.documentElement.style.setProperty('--b',db.settings.b);
+ document.getElementById('productList').innerHTML=db.products.length?db.products.map(p=>`<div class="product"><div><b>${esc(p.name)}</b><div class="muted">${esc(p.version)} • ${p.active?'Active':'Disabled'}</div><div class="muted">${esc(p.description)}</div><div class="price">₹${p.price}</div></div><div class="actions"><button onclick="editProduct(${p.id})">Edit</button><button class="danger" onclick="deleteProduct(${p.id})">Delete</button><a href="${esc(p.url)}" target="_blank"><button class="alt">Open</button></a></div></div>`).join(''):'<div class="empty">No products</div>';
+ document.getElementById('kProduct').innerHTML=db.products.map(p=>`<option value="${p.id}">${esc(p.name)} — ₹${p.price}</option>`).join('');
+ document.getElementById('keyRows').innerHTML=db.keys.length?db.keys.map((k,i)=>`<tr><td><b>${k.key}</b></td><td>${esc(k.user)}</td><td>${esc(k.product)}</td><td>${esc(k.expiry)}</td><td>1 DEVICE</td><td><span class="pill ${k.status==='ACTIVE'?'':'off'}">${k.status}</span></td><td><button class="danger" onclick="revokeKey(${i})">Revoke</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No keys yet</td></tr>';
+ document.getElementById('userRows').innerHTML=db.users.map(u=>`<tr><td>${esc(u.email)}</td><td>₹${u.wallet}</td><td>${u.purchases}</td><td><span class="pill ${u.active?'':'off'}">${u.active?'ACTIVE':'BLOCKED'}</span></td></tr>`).join('');
+ document.getElementById('setName').value=db.settings.name;document.getElementById('setEnabled').value=String(db.settings.enabled);document.getElementById('setRgb').value=String(db.settings.rgb);document.getElementById('setMaintenance').value=String(db.settings.maintenance);document.getElementById('setA').value=db.settings.a;document.getElementById('setB').value=db.settings.b;
+}
+function saveProduct(){let id=+document.getElementById('editId').value||Date.now();let p={id,name:document.getElementById('pName').value.trim(),price:+document.getElementById('pPrice').value||0,description:document.getElementById('pDesc').value.trim(),url:document.getElementById('pUrl').value.trim(),version:document.getElementById('pVersion').value.trim(),active:document.getElementById('pActive').value==='true'};if(!p.name||!p.url){alert('Name और Download URL जरूरी हैं');return}let ix=db.products.findIndex(x=>x.id===id);if(ix>=0)db.products[ix]=p;else db.products.push(p);clearProductForm();save()}
+function editProduct(id){let p=db.products.find(x=>x.id===id);document.getElementById('editId').value=p.id;document.getElementById('pName').value=p.name;document.getElementById('pPrice').value=p.price;document.getElementById('pDesc').value=p.description;document.getElementById('pUrl').value=p.url;document.getElementById('pVersion').value=p.version;document.getElementById('pActive').value=String(p.active);document.querySelector('[data-tab="products"]').click();scrollTo(0,0)}
+function clearProductForm(){['editId','pName','pPrice','pDesc','pUrl','pVersion'].forEach(id=>document.getElementById(id).value='');document.getElementById('pActive').value='true'}
+function deleteProduct(id){if(confirm('Delete this product?')){db.products=db.products.filter(p=>p.id!==id);save()}}
+function keyGen(){return 'BNTY-'+crypto.randomUUID().replaceAll('-','').slice(0,4).toUpperCase()+'-'+crypto.randomUUID().replaceAll('-','').slice(0,4).toUpperCase()+'-'+crypto.randomUUID().replaceAll('-','').slice(0,4).toUpperCase()}
+function generateKey(){let user=document.getElementById('kUser').value.trim();let pid=+document.getElementById('kProduct').value;let p=db.products.find(x=>x.id===pid);let days=+document.getElementById('kExpiry').value;if(!user||!p){alert('User और product चुनें');return}let d=new Date(Date.now()+days*86400000);db.keys.unshift({key:keyGen(),user,product:p.name,expiry:d.toLocaleDateString('en-IN'),status:'ACTIVE'});if(!db.users.some(u=>u.email===user))db.users.push({email:user,wallet:0,purchases:0,active:true});save();alert('Key generated')}
+function revokeKey(i){db.keys[i].status='REVOKED';save()}
+function saveSettings(){db.settings={name:document.getElementById('setName').value,enabled:document.getElementById('setEnabled').value==='true',rgb:document.getElementById('setRgb').value==='true',maintenance:document.getElementById('setMaintenance').value==='true',a:document.getElementById('setA').value,b:document.getElementById('setB').value};save();alert('Settings saved')}
+function resetDemo(){if(confirm('Reset all demo data?')){localStorage.removeItem(KEY);location.reload()}}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));document.getElementById(b.dataset.tab).classList.remove('hidden')});
+render();
+</script>
+</body>
+</html>
